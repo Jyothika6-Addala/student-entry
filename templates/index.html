@@ -3,11 +3,44 @@
 <head>
     <title>Student Entry Form</title>
     <style>
-        body { font-family: Arial; background: #f4f4f4; text-align: center; }
-        form { background: white; padding: 20px; margin: 20px auto; width: 300px; border-radius: 10px; }
-        input { width: 90%; padding: 8px; margin: 5px; }
-        button { padding: 8px 15px; background: blue; color: white; border: none; }
-        table { margin: auto; background: white; padding: 10px; }
+        body {
+            font-family: Arial;
+            background-color: #f2f2f2;
+            text-align: center;
+        }
+
+        form {
+            background: white;
+            padding: 20px;
+            margin: 20px auto;
+            width: 350px;
+            border-radius: 10px;
+        }
+
+        input {
+            width: 90%;
+            padding: 8px;
+            margin: 6px;
+        }
+
+        button {
+            padding: 8px 15px;
+            background: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        table {
+            margin: 20px auto;
+            background: white;
+            padding: 10px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+        }
     </style>
 </head>
 <body>
@@ -16,17 +49,11 @@
 
 <form method="POST">
     <input type="text" name="name" placeholder="Student Name" required><br>
-
     <input type="tel" name="phone" placeholder="Phone Number" required><br>
-
     <input type="text" name="course" placeholder="Course Needed to Study" required><br>
-
     <input type="text" name="location" placeholder="Location" required><br>
-
     <input type="text" name="school" placeholder="School" required><br>
-
     <input type="number" name="marks" placeholder="Marks" required><br>
-
     <input type="text" name="facultyname" placeholder="Faculty Name" required><br>
 
     <button type="submit">Add Student</button>
@@ -38,10 +65,14 @@
     <tr>
         <th>ID</th>
         <th>Name</th>
-        <th>Roll</th>
+        <th>Phone</th>
         <th>Course</th>
-        <th>Email</th>
+        <th>Location</th>
+        <th>School</th>
+        <th>Marks</th>
+        <th>Faculty</th>
     </tr>
+
     {% for student in students %}
     <tr>
         <td>{{ student[0] }}</td>
@@ -49,6 +80,9 @@
         <td>{{ student[2] }}</td>
         <td>{{ student[3] }}</td>
         <td>{{ student[4] }}</td>
+        <td>{{ student[5] }}</td>
+        <td>{{ student[6] }}</td>
+        <td>{{ student[7] }}</td>
     </tr>
     {% endfor %}
 </table>

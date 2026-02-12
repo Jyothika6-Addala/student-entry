@@ -3,7 +3,9 @@ import sqlite3
 
 app = Flask(__name__)
 
-# Create database table
+# -----------------------------
+# Create Database Table
+# -----------------------------
 def init_db():
     conn = sqlite3.connect("students.db")
     cursor = conn.cursor()
@@ -14,19 +16,23 @@ def init_db():
             phone TEXT,
             course TEXT,
             location TEXT,
-             school TEXT,
-                   marks TEXT,
-                   facultyname TEXT      
+            school TEXT,
+            marks TEXT,
+            facultyname TEXT
         )
     """)
     conn.commit()
     conn.close()
 
+
+# -----------------------------
+# Home Route
+# -----------------------------
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
         name = request.form["name"]
-        roll = request.form["phone"]
+        phone = request.form["phone"]
         course = request.form["course"]
         location = request.form["location"]
         school = request.form["school"]
@@ -35,8 +41,13 @@ def index():
 
         conn = sqlite3.connect("students.db")
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO students (name, phone, course, location, school, marks, facultyname) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                       (name, phone, course, location, school, marks, facultyname))
+
+        cursor.execute("""
+            INSERT INTO students 
+            (name, phone, course, location, school, marks, facultyname)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (name, phone, course, location, school, marks, facultyname))
+
         conn.commit()
         conn.close()
 
@@ -50,6 +61,10 @@ def index():
 
     return render_template("index.html", students=students)
 
+
+# -----------------------------
+# Run App
+# -----------------------------
 if __name__ == "__main__":
     init_db()
     app.run(debug=True)

@@ -10,10 +10,13 @@ def init_db():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS students (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            roll TEXT NOT NULL,
-            course TEXT NOT NULL,
-            email TEXT NOT NULL
+            name TEXT,
+            phone TEXT,
+            course TEXT,
+            location TEXT,
+             school TEXT,
+                   marks TEXT,
+                   facultyname TEXT      
         )
     """)
     conn.commit()
@@ -23,14 +26,17 @@ def init_db():
 def index():
     if request.method == "POST":
         name = request.form["name"]
-        roll = request.form["roll"]
+        roll = request.form["phone"]
         course = request.form["course"]
-        email = request.form["email"]
+        location = request.form["location"]
+        school = request.form["school"]
+        marks = request.form["marks"]
+        facultyname = request.form["facultyname"]
 
         conn = sqlite3.connect("students.db")
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO students (name, roll, course, email) VALUES (?, ?, ?, ?)",
-                       (name, roll, course, email))
+        cursor.execute("INSERT INTO students (name, phone, course, location, school, marks, facultyname) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                       (name, phone, course, location, school, marks, facultyname))
         conn.commit()
         conn.close()
 

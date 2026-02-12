@@ -1,16 +1,25 @@
 from flask import Flask, render_template, request, redirect
 import sqlite3
+import os
 
 app = Flask(__name__)
 
+DATABASE = "students.db"
+
+
 # -----------------------------
-# Create Database Table
+# Database Initialization
 # -----------------------------
 def init_db():
-    conn = sqlite3.connect("students.db")
+    conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
+
+    # Drop old table (important for Render redeploy)
+    cursor.execute("DROP TABLE IF EXISTS students")
+
+    # Create new table
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS students (
+        CREATE TABLE students (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
             phone TEXT,
@@ -21,6 +30,7 @@ def init_db():
             facultyname TEXT
         )
     """)
+
     conn.commit()
     conn.close()
 
@@ -30,6 +40,7 @@ def init_db():
 # -----------------------------
 @app.route("/", methods=["GET", "POST"])
 def index():
+
     if request.method == "POST":
         name = request.form["name"]
         phone = request.form["phone"]
@@ -39,11 +50,11 @@ def index():
         marks = request.form["marks"]
         facultyname = request.form["facultyname"]
 
-        conn = sqlite3.connect("students.db")
+        conn = sqlite3.connect(DATABASE)
         cursor = conn.cursor()
 
         cursor.execute("""
-            INSERT INTO students 
+            INSERT INTO students
             (name, phone, course, location, school, marks, facultyname)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         """, (name, phone, course, location, school, marks, facultyname))
@@ -53,7 +64,7 @@ def index():
 
         return redirect("/")
 
-    conn = sqlite3.connect("students.db")
+    conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM students")
     students = cursor.fetchall()

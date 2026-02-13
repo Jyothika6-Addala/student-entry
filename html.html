@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>jQuery Responsive Plugin</title>
+
+    <!-- jQuery and jQuery UI -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+    <script>
+        $(function () {
+            // Initialize datepicker
+            $("#datepicker-6").datepicker();
+
+            // Open datepicker when button is clicked
+            $("#datepicker-6-btn").click(function () {
+                $("#datepicker-6").datepicker("show");
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <p>
+        Enter date:
+        <input type="text" id="datepicker-6">
+        <button id="datepicker-6-btn">Select Date</button>
+    </p>
+</body>
+</html>

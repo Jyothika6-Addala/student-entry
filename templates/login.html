@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Student Registration</title>
-
-    <style>
+    <title>Admin Login</title>
+   <style>
     body {
         margin: 0;
         font-family: Arial, sans-serif;
-        background: url("{{ url_for('static', filename='bg1.jpg') }}") no-repeat center center fixed;
+        background: url("{{ url_for('static', filename='bg.jpg') }}") no-repeat center center fixed;
         background-size: cover;
     }
 
@@ -85,43 +84,20 @@
 </style>
 
 
+   
+    
 </head>
 
 <body>
 
-<!-- Top Header Section -->
-<div class="top-bar">
-    <h2 class="title">Student Registration Form</h2>
-    <div class="top-links">
-        <a href="/admin-login">Go to Admin Dashboard</a>
-        <a href="/logout">Logout</a>
-    </div>
-</div>
-
-<!-- Center Form -->
-<div class="form-container">
+<div class="box">
+    <h2>Admin Login</h2>
     <form method="POST">
-
-        <input type="text" name="name" placeholder="Student Name" required>
-        <input type="tel" name="phone1" placeholder="Phone Number 1"
-               pattern="^[6-9][0-9]{9}$" maxlength="10" required>
-
-        <input type="tel" name="phone2" placeholder="Phone Number 2"
-               pattern="^[6-9][0-9]{9}$" maxlength="10" required>
-
-        <input type="text" name="course" placeholder="Course Needed to Study" required>
-        <input type="text" name="place" placeholder="Place" required>
-        <input type="text" name="school" placeholder="School" required>
-        <input type="text" name="busnumber" placeholder="Bus Number" required>
-        <input type="text" name="reference" placeholder="Reference" required>
-
-        <input type="text" value="Date: {{ current_date }}" readonly>
-        <input type="text" value="Time: {{ current_time }}" readonly>
-
-        <button type="submit">Submit</button>
+        <input type="text" name="username" placeholder="Username" required><br>
+        <input type="password" name="password" placeholder="Password" required><br>
+        <button type="submit">Login</button>
     </form>
 </div>
 
 </body>
-
 </html>

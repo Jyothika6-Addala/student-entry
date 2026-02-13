@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background: url("{{ url_for('static', filename='bg2.jpg') }}") no-repeat center center fixed;
+        background-size: cover;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .container {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 30px;
+        width: 400px;
+        border-radius: 12px;
+        box-shadow: 0px 5px 20px rgba(0,0,0,0.3);
+        text-align: center;
+    }
+
+    h2 {
+        margin-bottom: 20px;
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+    }
+
+    button {
+        width: 100%;
+        padding: 10px;
+        background: #0056b3;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 15px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #003d80;
+    }
+
+    table {
+        margin-top: 20px;
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+    }
+
+    th, td {
+        padding: 8px;
+        border: 1px solid #ccc;
+        font-size: 13px;
+    }
+</style>
+
+    
+</head>
+<body>
+
+<h2>Admin Dashboard</h2>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Phone 1</th>
+        <th>Phone 2</th>
+        <th>Course</th>
+        <th>Place</th>
+        <th>School</th>
+        <th>Bus No</th>
+        <th>Reference</th>
+        <th>Date</th>
+        <th>Time</th>
+    </tr>
+
+    {% for student in students %}
+    <tr>
+        <td>{{ student[0] }}</td>
+        <td>{{ student[1] }}</td>
+        <td>{{ student[2] }}</td>
+        <td>{{ student[3] }}</td>
+        <td>{{ student[4] }}</td>
+        <td>{{ student[5] }}</td>
+        <td>{{ student[6] }}</td>
+        <td>{{ student[7] }}</td>
+        <td>{{ student[8] }}</td>
+        <td>{{ student[9] }}</td>
+        <td>{{ student[10] }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<br>
+<a href="/logout">
+    <button>Logout</button>
+</a>
+
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Edit Student</title>
+
+<style>
+
+body{
+margin:0;
+padding:0;
+font-family: Arial, sans-serif;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+/* Logo Background */
+body::before{
+content:"";
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+
+background-image:url("{{ url_for('static', filename='logo.png') }}");
+background-size:contain;
+background-position:center;
+background-repeat:no-repeat;
+
+opacity:0.12;
+z-index:-1;
+}
+
+/* Form container */
+.form-box{
+width:420px;
+background:white;
+padding:30px;
+border-radius:10px;
+box-shadow:0px 0px 15px rgba(0,0,0,0.3);
+text-align:center;
+}
+
+h2{
+margin-bottom:20px;
+}
+
+/* Inputs */
+input, select{
+width:100%;
+padding:10px;
+margin:10px 0;
+border-radius:5px;
+border:1px solid #ccc;
+font-size:14px;
+}
+
+/* Hover effect */
+input:hover, select:hover{
+border-color:#004aad;
+}
+
+/* Button */
+button{
+width:100%;
+padding:10px;
+background:#004aad;
+color:white;
+border:none;
+border-radius:5px;
+font-size:16px;
+cursor:pointer;
+}
+
+button:hover{
+background:#002f7a;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="form-box">
+
+<h2>Edit Student Details</h2>
+
+<form method="POST">
+
+<input type="text" name="name" value="{{student[1]}}" required>
+
+<input type="text" name="phone1" value="{{student[2]}}" placeholder="Father Phone Number">
+
+<input type="text" name="phone2" value="{{student[3]}}" placeholder="Phone Number 2">
+
+<input type="text" name="phone3" value="{{student[4]}}" placeholder="Reference Phone">
+
+<input type="text" name="course" value="{{student[6]}}" placeholder="Course">
+
+<input type="text" name="place" value="{{student[7]}}" placeholder="Place">
+
+<input type="text" name="school" value="{{student[8]}}" placeholder="School">
+
+<input type="text" name="busnumber" value="{{student[9]}}" placeholder="Bus Number">
+
+<input type="text" name="reference" value="{{student[10]}}" placeholder="Reference">
+
+<input type="text" name="reference_department" value="{{student[11]}}" placeholder="Reference Department">
+
+<button type="submit">Update Student</button>
+
+</form>
+
+</div>
+
+</body>
+</html>

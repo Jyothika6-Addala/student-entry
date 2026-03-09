@@ -1,127 +1,218 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Student Registration</title>
+<title>Student Registration</title>
 
-    <style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: url("{{ url_for('static', filename='bg1.jpg') }}") no-repeat center center fixed;
-        background-size: cover;
-    }
+<style>
 
-    /* Top Header */
-    .top-bar {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 15px 30px;
-        position: relative;
-        background: rgba(0, 0, 0, 0.6);
-        color: white;
-    }
+body{
+margin:0;
+padding:0;
+font-family:Arial;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:#f2f2f2;
+}
 
-    .title {
-        margin: 0;
-        font-size: 24px;
-        text-align: center;
-    }
+/* Background logo */
+body::before{
+content:"";
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background-image:url("{{ url_for('static', filename='logo.png') }}");
+background-size:contain;
+background-position:center;
+background-repeat:no-repeat;
+opacity:0.15;
+z-index:-1;
+}
 
-    .top-links {
-        position: absolute;
-        right: 30px;
-    }
+/* Dashboard button */
+.dashboard-btn{
+position:absolute;
+top:20px;
+right:30px;
+background:#004aad;
+color:white;
+padding:10px 15px;
+border-radius:5px;
+text-decoration:none;
+font-weight:bold;
+transition:0.3s;
+}
 
-    .top-links a {
-        color: white;
-        text-decoration: none;
-        margin-left: 15px;
-        font-weight: bold;
-    }
+.dashboard-btn:hover{
+background:#002f7a;
+transform:scale(1.05);
+}
 
-    .top-links a:hover {
-        text-decoration: underline;
-    }
+/* Form container */
+.form-container{
+background:rgba(255,255,255,0.9);
+padding:35px;
+width:420px;
+border-radius:10px;
+box-shadow:0px 0px 15px rgba(0,0,0,0.3);
+text-align:center;
+transition:0.3s;
+}
 
-    /* Form Section */
-    .form-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: 50px;
-    }
+/* Container hover */
+.form-container:hover{
+box-shadow:0px 0px 25px rgba(0,0,0,0.5);
+transform:scale(1.01);
+}
 
-    form {
-        background: rgba(255, 255, 255, 0.95);
-        padding: 30px;
-        width: 400px;
-        border-radius: 12px;
-        box-shadow: 0px 5px 20px rgba(0,0,0,0.3);
-    }
+/* Inputs and dropdowns */
+input,select{
+width:100%;
+padding:10px;
+margin:10px 0;
+border:1px solid #ccc;
+border-radius:5px;
+transition:0.3s;
+}
 
-    input {
-        width: 100%;
-        padding: 10px;
-        margin: 8px 0;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-    }
+/* Input hover */
+input:hover,select:hover{
+border:1px solid #004aad;
+box-shadow:0px 0px 5px rgba(0,74,173,0.5);
+}
 
-    button {
-        width: 100%;
-        padding: 10px;
-        background: #0056b3;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-size: 15px;
-        cursor: pointer;
-    }
+/* Input focus effect */
+input:focus,select:focus{
+outline:none;
+border:1px solid #004aad;
+box-shadow:0px 0px 8px rgba(0,74,173,0.8);
+}
 
-    button:hover {
-        background: #003d80;
-    }
+/* Submit button */
+button{
+width:100%;
+padding:10px;
+background:#004aad;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+transition:0.3s;
+}
+
+/* Button hover */
+button:hover{
+background:#002f7a;
+transform:scale(1.03);
+box-shadow:0px 0px 10px rgba(0,0,0,0.4);
+}
+
 </style>
-
 
 </head>
 
 <body>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<script>
+alert("{{ messages[0] }}");
+</script>
+{% endif %}
+{% endwith %}
 
-<!-- Top Header Section -->
-<div class="top-bar">
-    <h2 class="title">Student Registration Form</h2>
-    <div class="top-links">
-        <a href="/admin-login">Go to Admin Dashboard</a>
-        <a href="/logout">Logout</a>
-    </div>
-</div>
+<a href="/admin-login" class="dashboard-btn">Go to Dashboard</a>
 
-<!-- Center Form -->
 <div class="form-container">
-    <form method="POST">
 
-        <input type="text" name="name" placeholder="Student Name" required>
-        <input type="tel" name="phone1" placeholder="Phone Number 1"
-               pattern="^[6-9][0-9]{9}$" maxlength="10" required>
+<h2>Student Registration Form</h2>
 
-        <input type="tel" name="phone2" placeholder="Phone Number 2"
-               pattern="^[6-9][0-9]{9}$" maxlength="10" required>
+<form method="POST">
 
-        <input type="text" name="course" placeholder="Course Needed to Study" required>
-        <input type="text" name="place" placeholder="Place" required>
-        <input type="text" name="school" placeholder="School" required>
-        <input type="text" name="busnumber" placeholder="Bus Number" required>
-        <input type="text" name="reference" placeholder="Reference" required>
+<input type="text" name="name" placeholder="Student Name" required>
 
-        <input type="text" value="Date: {{ current_date }}" readonly>
-        <input type="text" value="Time: {{ current_time }}" readonly>
+<input type="tel" name="phone1" placeholder="Father Phone Number"
+pattern="[0-9]{10}" maxlength="10" required>
 
-        <button type="submit">Submit</button>
-    </form>
+<input type="tel" name="phone2" placeholder="Phone Number 2"
+pattern="[0-9]{10}" maxlength="10">
+
+<input type="tel" name="phone3" placeholder="Ref Phone Number"
+pattern="[0-9]{10}" maxlength="10">
+
+<input type="text" id="hallticket" name="hallticket"
+placeholder="Hall Ticket Number"
+onblur="checkHallticket()" required>
+
+<span id="hallticket-msg" style="color:red;font-size:14px;"></span>
+
+<select name="course" required>
+<option value="">Select Course</option>
+<option value="CME">Computer Engineering</option>
+<option value="AIML">Artificial Intelligence & Machine Learning</option>
+<option value="ECE">Electronics & Communication Engineering</option>
+<option value="EEE">Electrical & Electronics Engineering</option>
+<option value="ME">Mechanical Engineering</option>
+</select>
+
+<input type="text" name="place" placeholder="Place" required>
+
+<input type="text" name="school" placeholder="School" required>
+
+<input type="text" name="busnumber" placeholder="Bus Number">
+
+<input type="text" name="reference" placeholder="Reference" required>
+
+<select name="reference_department" required>
+<option value="">Select Reference Department</option>
+<option value="poly_student">Poly Student</option>
+<option value="poly_staff">Polytechnic Staff</option>
+<option value="cse">CSE Department</option>
+<option value="it">IT Department</option>
+<option value="aiml">AIML Department</option>
+<option value="ece">ECE Department</option>
+<option value="eee">EEE Department</option>
+<option value="mech">Mechanical Department</option>
+<option value="civil">Civil Department</option>
+<option value="admin">Administration</option>
+</select>
+
+<button type="submit">Submit</button>
+
+</form>
+
 </div>
+<script>
 
+function checkHallticket(){
+
+let hallticket = document.getElementById("hallticket").value;
+
+fetch("/check-hallticket",{
+method:"POST",
+headers:{
+"Content-Type":"application/x-www-form-urlencoded"
+},
+body:"hallticket="+hallticket
+})
+.then(response=>response.json())
+.then(data=>{
+
+if(data.exists){
+document.getElementById("hallticket-msg").innerHTML =
+"Hall Ticket already registered!";
+}else{
+document.getElementById("hallticket-msg").innerHTML =
+"Hall Ticket available";
+}
+
+});
+
+}
+
+</script>
 </body>
 
 </html>

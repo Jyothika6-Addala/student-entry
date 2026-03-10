@@ -43,9 +43,9 @@ init_db()
 
 
 # -----------------------------
-# Student Login Page
+# Login Page
 # -----------------------------
-@app.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["GET","POST"])
 def login():
 
     if request.method == "POST":
@@ -63,9 +63,9 @@ def login():
 
 
 # -----------------------------
-# Student Registration Form
+# Student Registration
 # -----------------------------
-@app.route("/form", methods=["GET", "POST"])
+@app.route("/form", methods=["GET","POST"])
 def form():
 
     if request.method == "POST":
@@ -90,35 +90,41 @@ def form():
         cursor = conn.cursor()
 
         # Check duplicate hallticket
-        cursor.execute("SELECT * FROM students WHERE hallticket=?", (hallticket,))
-        existing = cursor.fetchone()
+        cursor.execute("SELECT 1 FROM students WHERE hallticket=?", (hallticket,))
+        exists = cursor.fetchone()
 
-        if existing:
-            flash("Hall Ticket Number already registered!")
+        if exists:
             conn.close()
+            flash("Hallticket number is already entered")
             return redirect("/form")
 
-        cursor.execute("""
-        INSERT INTO students
-        (name, phone1, phone2, phone3, hallticket, course, place, school,
-        busnumber, reference, reference_department, date, time)
+        try:
+            cursor.execute("""
+            INSERT INTO students
+            (name, phone1, phone2, phone3, hallticket, course, place, school,
+            busnumber, reference, reference_department, date, time)
 
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
-        """,
-        (name, phone1, phone2, phone3, hallticket, course, place,
-         school, busnumber, reference, reference_department, date, time))
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+            """,
+            (name, phone1, phone2, phone3, hallticket, course, place,
+             school, busnumber, reference, reference_department, date, time))
 
-        conn.commit()
+            conn.commit()
+
+        except sqlite3.IntegrityError:
+            flash("Hallticket number is already entered")
+
         conn.close()
 
-        flash("Student Registered Successfully!")
+        flash("Student Registered Successfully")
+
         return redirect("/form")
 
     return render_template("index.html")
 
 
 # -----------------------------
-# Check Hallticket (AJAX)
+# Hallticket Live Check
 # -----------------------------
 @app.route("/check-hallticket", methods=["POST"])
 def check_hallticket():
@@ -142,7 +148,7 @@ def check_hallticket():
 # -----------------------------
 # Admin Login
 # -----------------------------
-@app.route("/admin-login", methods=["GET", "POST"])
+@app.route("/admin-login", methods=["GET","POST"])
 def admin_login():
 
     if request.method == "POST":
@@ -161,7 +167,7 @@ def admin_login():
 
 
 # -----------------------------
-# Admin Dashboard
+# Dashboard
 # -----------------------------
 @app.route("/dashboard")
 def dashboard():
@@ -186,9 +192,9 @@ def dashboard():
 
 
 # -----------------------------
-# Edit Student Details
+# Edit Student
 # -----------------------------
-@app.route("/edit/<int:id>", methods=["GET", "POST"])
+@app.route("/edit/<int:id>", methods=["GET","POST"])
 def edit(id):
 
     if "admin" not in session:
@@ -211,17 +217,8 @@ def edit(id):
         reference_department = request.form["reference_department"]
 
         cursor.execute("""
-        UPDATE students SET
-        name=?,
-        phone1=?,
-        phone2=?,
-        phone3=?,
-        course=?,
-        place=?,
-        school=?,
-        busnumber=?,
-        reference=?,
-        reference_department=?
+        UPDATE students
+        SET name=?, phone1=?, phone2=?, phone3=?, course=?, place=?, school=?, busnumber=?, reference=?, reference_department=?
         WHERE id=?
         """,
         (name, phone1, phone2, phone3, course, place,
@@ -230,7 +227,8 @@ def edit(id):
         conn.commit()
         conn.close()
 
-        flash("Student details updated successfully!")
+        flash("Student Updated Successfully")
+
         return redirect("/dashboard")
 
     cursor.execute("SELECT * FROM students WHERE id=?", (id,))
@@ -242,7 +240,7 @@ def edit(id):
 
 
 # -----------------------------
-# Export Excel File
+# Export Excel
 # -----------------------------
 @app.route("/export")
 def export():

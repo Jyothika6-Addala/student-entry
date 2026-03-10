@@ -6,63 +6,28 @@
 <style>
 
 body{
-margin:0;
-padding:0;
-font-family: Arial, sans-serif;
-height:100vh;
+font-family:Arial;
+background:#f2f2f2;
 display:flex;
 justify-content:center;
 align-items:center;
+height:100vh;
 }
 
-/* Logo Background */
-body::before{
-content:"";
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-
-background-image:url("{{ url_for('static', filename='logo.png') }}");
-background-size:contain;
-background-position:center;
-background-repeat:no-repeat;
-
-opacity:0.12;
-z-index:-1;
-}
-
-/* Form container */
 .form-box{
-width:420px;
 background:white;
 padding:30px;
-border-radius:10px;
-box-shadow:0px 0px 15px rgba(0,0,0,0.3);
-text-align:center;
+width:400px;
+border-radius:8px;
+box-shadow:0 0 10px rgba(0,0,0,0.2);
 }
 
-h2{
-margin-bottom:20px;
-}
-
-/* Inputs */
-input, select{
+input{
 width:100%;
 padding:10px;
-margin:10px 0;
-border-radius:5px;
-border:1px solid #ccc;
-font-size:14px;
+margin:8px 0;
 }
 
-/* Hover effect */
-input:hover, select:hover{
-border-color:#004aad;
-}
-
-/* Button */
 button{
 width:100%;
 padding:10px;
@@ -70,12 +35,6 @@ background:#004aad;
 color:white;
 border:none;
 border-radius:5px;
-font-size:16px;
-cursor:pointer;
-}
-
-button:hover{
-background:#002f7a;
 }
 
 </style>
@@ -86,29 +45,29 @@ background:#002f7a;
 
 <div class="form-box">
 
-<h2>Edit Student Details</h2>
+<h2>Edit Student</h2>
 
 <form method="POST">
 
 <input type="text" name="name" value="{{student[1]}}" required>
 
-<input type="text" name="phone1" value="{{student[2]}}" placeholder="Father Phone Number">
+<input type="text" name="phone1" value="{{student[2]}}" required>
 
-<input type="text" name="phone2" value="{{student[3]}}" placeholder="Phone Number 2">
+<input type="text" name="phone2" value="{{student[3]}}">
 
-<input type="text" name="phone3" value="{{student[4]}}" placeholder="Reference Phone">
+<input type="text" name="phone3" value="{{student[4]}}">
 
-<input type="text" name="course" value="{{student[6]}}" placeholder="Course">
+<input type="text" name="course" value="{{student[6]}}">
 
-<input type="text" name="place" value="{{student[7]}}" placeholder="Place">
+<input type="text" name="place" value="{{student[7]}}">
 
-<input type="text" name="school" value="{{student[8]}}" placeholder="School">
+<input type="text" name="school" value="{{student[8]}}">
 
-<input type="text" name="busnumber" value="{{student[9]}}" placeholder="Bus Number">
+<input type="text" name="busnumber" value="{{student[9]}}">
 
-<input type="text" name="reference" value="{{student[10]}}" placeholder="Reference">
+<input type="text" name="reference" value="{{student[10]}}">
 
-<input type="text" name="reference_department" value="{{student[11]}}" placeholder="Reference Department">
+<input type="text" name="reference_department" value="{{student[11]}}">
 
 <button type="submit">Update Student</button>
 

@@ -4,35 +4,6 @@
 <title>Student Registration</title>
 
 <style>
-
-body{
-margin:0;
-padding:0;
-font-family:Arial;
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-background:#f2f2f2;
-}
-
-/* Background logo */
-body::before{
-content:"";
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background-image:url("{{ url_for('static', filename='logo.png') }}");
-background-size:contain;
-background-position:center;
-background-repeat:no-repeat;
-opacity:0.15;
-z-index:-1;
-}
-
-/* Dashboard button */
 .dashboard-btn{
 position:absolute;
 top:20px;
@@ -43,55 +14,65 @@ padding:10px 15px;
 border-radius:5px;
 text-decoration:none;
 font-weight:bold;
-transition:0.3s;
 }
 
 .dashboard-btn:hover{
 background:#002f7a;
-transform:scale(1.05);
+}
+body{
+margin:0;
+padding:0;
+font-family: Arial, sans-serif;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+/* Logo background */
+body::before{
+content:"";
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+
+background-image:url("{{ url_for('static', filename='logo.png') }}");
+background-size:contain;
+background-position:center;
+background-repeat:no-repeat;
+
+opacity:0.12;
+z-index:-1;
 }
 
 /* Form container */
 .form-container{
-background:rgba(255,255,255,0.9);
+background:white;
 padding:35px;
 width:420px;
 border-radius:10px;
 box-shadow:0px 0px 15px rgba(0,0,0,0.3);
 text-align:center;
-transition:0.3s;
 }
 
-/* Container hover */
-.form-container:hover{
-box-shadow:0px 0px 25px rgba(0,0,0,0.5);
-transform:scale(1.01);
-}
-
-/* Inputs and dropdowns */
-input,select{
+/* Inputs */
+input, select{
 width:100%;
 padding:10px;
 margin:10px 0;
 border:1px solid #ccc;
 border-radius:5px;
-transition:0.3s;
+font-size:14px;
 }
 
-/* Input hover */
-input:hover,select:hover{
-border:1px solid #004aad;
-box-shadow:0px 0px 5px rgba(0,74,173,0.5);
+/* Hover effect */
+input:hover, select:hover{
+border-color:#004aad;
 }
 
-/* Input focus effect */
-input:focus,select:focus{
-outline:none;
-border:1px solid #004aad;
-box-shadow:0px 0px 8px rgba(0,74,173,0.8);
-}
-
-/* Submit button */
+/* Button */
 button{
 width:100%;
 padding:10px;
@@ -99,15 +80,12 @@ background:#004aad;
 color:white;
 border:none;
 border-radius:5px;
+font-size:16px;
 cursor:pointer;
-transition:0.3s;
 }
 
-/* Button hover */
 button:hover{
 background:#002f7a;
-transform:scale(1.03);
-box-shadow:0px 0px 10px rgba(0,0,0,0.4);
 }
 
 </style>
@@ -115,6 +93,12 @@ box-shadow:0px 0px 10px rgba(0,0,0,0.4);
 </head>
 
 <body>
+
+<div class="form-container">
+
+<h2>Student Registration Form</h2>
+
+<!-- Popup message -->
 {% with messages = get_flashed_messages() %}
 {% if messages %}
 <script>
@@ -123,38 +107,51 @@ alert("{{ messages[0] }}");
 {% endif %}
 {% endwith %}
 
-<a href="/admin-login" class="dashboard-btn">Go to Dashboard</a>
-
-<div class="form-container">
-
-<h2>Student Registration Form</h2>
-
 <form method="POST">
 
 <input type="text" name="name" placeholder="Student Name" required>
 
-<input type="tel" name="phone1" placeholder="Father Phone Number"
-pattern="[0-9]{10}" maxlength="10" required>
+<!-- Father Phone -->
+<input type="tel"
+name="phone1"
+placeholder="Father Phone Number"
+pattern="[6-9]{1}[0-9]{9}"
+maxlength="10"
+inputmode="numeric"
+title="Enter a valid 10-digit Indian phone number"
+required>
 
-<input type="tel" name="phone2" placeholder="Phone Number 2"
-pattern="[0-9]{10}" maxlength="10">
+<!-- Phone 2 -->
+<input type="tel"
+name="phone2"
+placeholder="Phone Number 2"
+pattern="[6-9]{1}[0-9]{9}"
+maxlength="10"
+inputmode="numeric"
+title="Enter a valid 10-digit Indian phone number">
 
-<input type="tel" name="phone3" placeholder="Ref Phone Number"
-pattern="[0-9]{10}" maxlength="10">
+<!-- Reference Phone -->
+<input type="tel"
+name="phone3"
+placeholder="Reference Phone Number"
+pattern="[6-9]{1}[0-9]{9}"
+maxlength="10"
+inputmode="numeric"
+title="Enter a valid 10-digit Indian phone number">
 
-<input type="text" id="hallticket" name="hallticket"
-placeholder="Hall Ticket Number"
-onblur="checkHallticket()" required>
+<input type="number" id="hallticket" name="hallticket" placeholder="Hall Ticket Number" required>
 
-<span id="hallticket-msg" style="color:red;font-size:14px;"></span>
+<p id="hallticket-msg" style="color:red;font-size:14px;"></p>
 
+<!-- Course Dropdown -->
 <select name="course" required>
 <option value="">Select Course</option>
-<option value="CME">Computer Engineering</option>
-<option value="AIML">Artificial Intelligence & Machine Learning</option>
-<option value="ECE">Electronics & Communication Engineering</option>
-<option value="EEE">Electrical & Electronics Engineering</option>
-<option value="ME">Mechanical Engineering</option>
+<option value="CME">Computer Engineering (CME)</option>
+<option value="AIML">Artificial Intelligence & Machine Learning (AIML)</option>
+<option value="ECE">Electronics & Communication Engineering (ECE)</option>
+<option value="EEE">Electrical & Electronics Engineering (EEE)</option>
+<option value="ME">Mechanical Engineering (ME)</option>
+<option value="CIVIL">Civil Engineering</option>
 </select>
 
 <input type="text" name="place" placeholder="Place" required>
@@ -165,18 +162,19 @@ onblur="checkHallticket()" required>
 
 <input type="text" name="reference" placeholder="Reference" required>
 
+<!-- Reference Department -->
 <select name="reference_department" required>
 <option value="">Select Reference Department</option>
-<option value="poly_student">Poly Student</option>
-<option value="poly_staff">Polytechnic Staff</option>
-<option value="cse">CSE Department</option>
-<option value="it">IT Department</option>
-<option value="aiml">AIML Department</option>
-<option value="ece">ECE Department</option>
-<option value="eee">EEE Department</option>
-<option value="mech">Mechanical Department</option>
-<option value="civil">Civil Department</option>
-<option value="admin">Administration</option>
+<option value="POLY STUDENT">Poly Student</option>
+<option value="POLY STAFF">Polytechnic Staff</option>
+<option value="CSE">CSE Department</option>
+<option value="IT">IT Department</option>
+<option value="AIML">AIML Department</option>
+<option value="ECE">ECE Department</option>
+<option value="EEE">EEE Department</option>
+<option value="MECH">Mechanical Department</option>
+<option value="CIVIL">Civil Department</option>
+<option value="ADMIN">Administration</option>
 </select>
 
 <button type="submit">Submit</button>
@@ -184,11 +182,15 @@ onblur="checkHallticket()" required>
 </form>
 
 </div>
+
+<!-- Hallticket Live Check -->
 <script>
 
-function checkHallticket(){
+document.getElementById("hallticket").addEventListener("keyup", function(){
 
-let hallticket = document.getElementById("hallticket").value;
+let hallticket = this.value;
+
+if(hallticket.length == 0) return;
 
 fetch("/check-hallticket",{
 method:"POST",
@@ -202,17 +204,16 @@ body:"hallticket="+hallticket
 
 if(data.exists){
 document.getElementById("hallticket-msg").innerHTML =
-"Hall Ticket already registered!";
+"Hallticket number is already entered";
 }else{
-document.getElementById("hallticket-msg").innerHTML =
-"Hall Ticket available";
+document.getElementById("hallticket-msg").innerHTML = "";
 }
 
 });
 
-}
+});
 
 </script>
+<a href="/admin-login" class="dashboard-btn">Go to Dashboard</a>
 </body>
-
 </html>

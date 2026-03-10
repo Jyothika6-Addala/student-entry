@@ -260,6 +260,26 @@ def export():
     return send_file(file, as_attachment=True)
 
 
+
+
+@app.route("/reset-db")
+def reset_db():
+
+    if "admin" not in session:
+        return redirect("/admin-login")
+
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM students")
+
+    conn.commit()
+    conn.close()
+
+    flash("Database cleared successfully")
+
+    return redirect("/dashboard")
+
 # -----------------------------
 # Logout
 # -----------------------------

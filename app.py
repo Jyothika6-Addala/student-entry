@@ -1,45 +1,88 @@
 from flask import Flask, render_template, request, redirect, session, send_file, flash, jsonify
-import sqlite3
 from datetime import datetime
 import pandas as pd
+import sqlite3
+import psycopg2
+import pytz
+import os
 
 app = Flask(__name__)
 app.secret_key = "secretkey"
 
-DATABASE = "students.db"
+# -----------------------------
+# DATABASE SETUP
+# -----------------------------
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if DATABASE_URL:
+    DB_TYPE = "postgres"
+    PARAM = "%s"
+else:
+    DB_TYPE = "sqlite"
+    PARAM = "?"
+
+def get_db():
+    if DB_TYPE == "postgres":
+        conn = psycopg2.connect(DATABASE_URL)
+    else:
+        conn = sqlite3.connect("students.db")
+    return conn
 
 
 # -----------------------------
-# CREATE DATABASE
+# CREATE TABLE
 # -----------------------------
 
 def init_db():
 
-    conn = sqlite3.connect(DATABASE)
+    conn = get_db()
     cursor = conn.cursor()
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS students(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        phone1 TEXT,
-        phone2 TEXT,
-        phone3 TEXT,
-        hallticket TEXT UNIQUE,
-        course TEXT,
-        place TEXT,
-        school TEXT,
-        busnumber TEXT,
-        reference TEXT,
-        reference_department TEXT,
-        date TEXT,
-        time TEXT
-    )
-    """)
+    if DB_TYPE == "postgres":
+
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS students(
+            id SERIAL PRIMARY KEY,
+            name TEXT,
+            phone1 TEXT,
+            phone2 TEXT,
+            phone3 TEXT,
+            hallticket TEXT UNIQUE,
+            course TEXT,
+            place TEXT,
+            school TEXT,
+            busnumber TEXT,
+            reference TEXT,
+            reference_department TEXT,
+            date TEXT,
+            time TEXT
+        )
+        """)
+
+    else:
+
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS students(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            phone1 TEXT,
+            phone2 TEXT,
+            phone3 TEXT,
+            hallticket TEXT UNIQUE,
+            course TEXT,
+            place TEXT,
+            school TEXT,
+            busnumber TEXT,
+            reference TEXT,
+            reference_department TEXT,
+            date TEXT,
+            time TEXT
+        )
+        """)
 
     conn.commit()
     conn.close()
-
 
 init_db()
 
@@ -56,7 +99,6 @@ def login():
         username = request.form.get("username")
         password = request.form.get("password")
 
-        # simple login
         if username == "staff" and password == "123":
 
             session["user"] = username
@@ -91,29 +133,29 @@ def form():
         reference = request.form.get("reference")
         reference_department = request.form.get("reference_department")
 
-        now = datetime.now()
-        date = now.strftime("%d-%m-%Y")
-        time = now.strftime("%H:%M:%S")
+        india = pytz.timezone('Asia/Kolkata')
+        now = datetime.now(india)
 
-        conn = sqlite3.connect(DATABASE)
+        date = now.strftime("%d-%m-%Y")
+        time = now.strftime("%I:%M:%S %p")
+
+        conn = get_db()
         cursor = conn.cursor()
 
-        # duplicate hallticket check
-        cursor.execute("SELECT * FROM students WHERE hallticket=?", (hallticket,))
+        cursor.execute(f"SELECT * FROM students WHERE hallticket={PARAM}", (hallticket,))
         existing = cursor.fetchone()
 
         if existing:
-
             flash("Hallticket number already entered")
             conn.close()
             return render_template("index.html")
 
-        cursor.execute("""
+        cursor.execute(f"""
         INSERT INTO students
         (name,phone1,phone2,phone3,hallticket,course,place,school,
         busnumber,reference,reference_department,date,time)
 
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+        VALUES ({PARAM},{PARAM},{PARAM},{PARAM},{PARAM},{PARAM},{PARAM},{PARAM},{PARAM},{PARAM},{PARAM},{PARAM},{PARAM})
         """,
         (name,phone1,phone2,phone3,hallticket,course,place,
         school,busnumber,reference,reference_department,date,time))
@@ -137,18 +179,15 @@ def check_hallticket():
 
     hallticket = request.form.get("hallticket")
 
-    conn = sqlite3.connect(DATABASE)
+    conn = get_db()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM students WHERE hallticket=?", (hallticket,))
+    cursor.execute(f"SELECT * FROM students WHERE hallticket={PARAM}", (hallticket,))
     data = cursor.fetchone()
 
     conn.close()
 
-    if data:
-        return jsonify({"exists":True})
-    else:
-        return jsonify({"exists":False})
+    return jsonify({"exists": bool(data)})
 
 
 # -----------------------------
@@ -185,20 +224,19 @@ def dashboard():
 
     search = request.args.get("search")
 
-    conn = sqlite3.connect(DATABASE)
+    conn = get_db()
     cursor = conn.cursor()
 
     if search:
-        cursor.execute("SELECT * FROM students WHERE hallticket=?", (search,))
+        cursor.execute(f"SELECT * FROM students WHERE hallticket={PARAM}", (search,))
     else:
-        cursor.execute("SELECT * FROM students")
+        cursor.execute("SELECT * FROM students ORDER BY id DESC")
 
     students = cursor.fetchall()
 
     conn.close()
 
     return render_template("admin.html", students=students)
-
 
 
 # -----------------------------
@@ -211,7 +249,7 @@ def edit(id):
     if "admin" not in session:
         return redirect("/admin-login")
 
-    conn = sqlite3.connect(DATABASE)
+    conn = get_db()
     cursor = conn.cursor()
 
     if request.method == "POST":
@@ -227,11 +265,12 @@ def edit(id):
         reference = request.form.get("reference")
         reference_department = request.form.get("reference_department")
 
-        cursor.execute("""
+        cursor.execute(f"""
         UPDATE students
-        SET name=?,phone1=?,phone2=?,phone3=?,course=?,place=?,
-        school=?,busnumber=?,reference=?,reference_department=?
-        WHERE id=?
+        SET name={PARAM},phone1={PARAM},phone2={PARAM},phone3={PARAM},
+        course={PARAM},place={PARAM},school={PARAM},busnumber={PARAM},
+        reference={PARAM},reference_department={PARAM}
+        WHERE id={PARAM}
         """,
         (name,phone1,phone2,phone3,course,place,
         school,busnumber,reference,reference_department,id))
@@ -241,7 +280,7 @@ def edit(id):
 
         return redirect("/dashboard")
 
-    cursor.execute("SELECT * FROM students WHERE id=?", (id,))
+    cursor.execute(f"SELECT * FROM students WHERE id={PARAM}", (id,))
     student = cursor.fetchone()
 
     conn.close()
@@ -256,7 +295,7 @@ def edit(id):
 @app.route("/export")
 def export():
 
-    conn = sqlite3.connect(DATABASE)
+    conn = get_db()
 
     df = pd.read_sql_query("SELECT * FROM students", conn)
 
@@ -275,7 +314,7 @@ def export():
 @app.route("/reset-db")
 def reset_db():
 
-    conn = sqlite3.connect(DATABASE)
+    conn = get_db()
     cursor = conn.cursor()
 
     cursor.execute("DELETE FROM students")

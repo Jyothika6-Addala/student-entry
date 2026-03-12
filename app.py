@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, send_file, flash
+from flask import Flask, render_template, request, redirect, session, send_file, flash, jsonify
 import sqlite3
 from datetime import datetime
 import pandas as pd
@@ -10,9 +10,11 @@ DATABASE = "students.db"
 
 
 # -----------------------------
-# Create Database Table
+# CREATE DATABASE
 # -----------------------------
+
 def init_db():
+
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
 
@@ -43,44 +45,51 @@ init_db()
 
 
 # -----------------------------
-# Login Page
+# LOGIN PAGE
 # -----------------------------
+
 @app.route("/", methods=["GET","POST"])
 def login():
 
     if request.method == "POST":
 
-        username = request.form["username"]
-        password = request.form["password"]
+        username = request.form.get("username")
+        password = request.form.get("password")
 
-        if username == "student" and password == "123":
+        # simple login
+        if username == "staff" and password == "123":
+
+            session["user"] = username
             return redirect("/form")
 
-        else:
-            flash("Invalid Login")
+        flash("Invalid Login")
 
     return render_template("login.html")
 
 
 # -----------------------------
-# Student Registration
+# STUDENT FORM
 # -----------------------------
+
 @app.route("/form", methods=["GET","POST"])
 def form():
 
+    if "user" not in session:
+        return redirect("/")
+
     if request.method == "POST":
 
-        name = request.form["name"]
-        phone1 = request.form["phone1"]
-        phone2 = request.form["phone2"]
-        phone3 = request.form["phone3"]
-        hallticket = request.form["hallticket"]
-        course = request.form["course"]
-        place = request.form["place"]
-        school = request.form["school"]
-        busnumber = request.form["busnumber"]
-        reference = request.form["reference"]
-        reference_department = request.form["reference_department"]
+        name = request.form.get("name")
+        phone1 = request.form.get("phone1")
+        phone2 = request.form.get("phone2")
+        phone3 = request.form.get("phone3")
+        hallticket = request.form.get("hallticket")
+        course = request.form.get("course")
+        place = request.form.get("place")
+        school = request.form.get("school")
+        busnumber = request.form.get("busnumber")
+        reference = request.form.get("reference")
+        reference_department = request.form.get("reference_department")
 
         now = datetime.now()
         date = now.strftime("%d-%m-%Y")
@@ -89,31 +98,27 @@ def form():
         conn = sqlite3.connect(DATABASE)
         cursor = conn.cursor()
 
-        # Check duplicate hallticket
-        cursor.execute("SELECT 1 FROM students WHERE hallticket=?", (hallticket,))
-        exists = cursor.fetchone()
+        # duplicate hallticket check
+        cursor.execute("SELECT * FROM students WHERE hallticket=?", (hallticket,))
+        existing = cursor.fetchone()
 
-        if exists:
+        if existing:
+
+            flash("Hallticket number already entered")
             conn.close()
-            flash("Hallticket number is already entered")
-            return redirect("/form")
+            return render_template("index.html")
 
-        try:
-            cursor.execute("""
-            INSERT INTO students
-            (name, phone1, phone2, phone3, hallticket, course, place, school,
-            busnumber, reference, reference_department, date, time)
+        cursor.execute("""
+        INSERT INTO students
+        (name,phone1,phone2,phone3,hallticket,course,place,school,
+        busnumber,reference,reference_department,date,time)
 
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
-            """,
-            (name, phone1, phone2, phone3, hallticket, course, place,
-             school, busnumber, reference, reference_department, date, time))
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+        """,
+        (name,phone1,phone2,phone3,hallticket,course,place,
+        school,busnumber,reference,reference_department,date,time))
 
-            conn.commit()
-
-        except sqlite3.IntegrityError:
-            flash("Hallticket number is already entered")
-
+        conn.commit()
         conn.close()
 
         flash("Student Registered Successfully")
@@ -124,12 +129,13 @@ def form():
 
 
 # -----------------------------
-# Hallticket Live Check
+# LIVE HALLTICKET CHECK
 # -----------------------------
+
 @app.route("/check-hallticket", methods=["POST"])
 def check_hallticket():
 
-    hallticket = request.form["hallticket"]
+    hallticket = request.form.get("hallticket")
 
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
@@ -140,35 +146,37 @@ def check_hallticket():
     conn.close()
 
     if data:
-        return {"exists": True}
+        return jsonify({"exists":True})
     else:
-        return {"exists": False}
+        return jsonify({"exists":False})
 
 
 # -----------------------------
-# Admin Login
+# ADMIN LOGIN
 # -----------------------------
+
 @app.route("/admin-login", methods=["GET","POST"])
 def admin_login():
 
     if request.method == "POST":
 
-        username = request.form["username"]
-        password = request.form["password"]
+        username = request.form.get("username")
+        password = request.form.get("password")
 
         if username == "admin" and password == "admin123":
+
             session["admin"] = True
             return redirect("/dashboard")
 
-        else:
-            flash("Invalid Login")
+        flash("Invalid Login")
 
     return render_template("admin_login.html")
 
 
 # -----------------------------
-# Dashboard
+# DASHBOARD
 # -----------------------------
+
 @app.route("/dashboard")
 def dashboard():
 
@@ -186,14 +194,17 @@ def dashboard():
         cursor.execute("SELECT * FROM students")
 
     students = cursor.fetchall()
+
     conn.close()
 
     return render_template("admin.html", students=students)
 
 
+
 # -----------------------------
-# Edit Student
+# EDIT STUDENT
 # -----------------------------
+
 @app.route("/edit/<int:id>", methods=["GET","POST"])
 def edit(id):
 
@@ -205,29 +216,28 @@ def edit(id):
 
     if request.method == "POST":
 
-        name = request.form["name"]
-        phone1 = request.form["phone1"]
-        phone2 = request.form["phone2"]
-        phone3 = request.form["phone3"]
-        course = request.form["course"]
-        place = request.form["place"]
-        school = request.form["school"]
-        busnumber = request.form["busnumber"]
-        reference = request.form["reference"]
-        reference_department = request.form["reference_department"]
+        name = request.form.get("name")
+        phone1 = request.form.get("phone1")
+        phone2 = request.form.get("phone2")
+        phone3 = request.form.get("phone3")
+        course = request.form.get("course")
+        place = request.form.get("place")
+        school = request.form.get("school")
+        busnumber = request.form.get("busnumber")
+        reference = request.form.get("reference")
+        reference_department = request.form.get("reference_department")
 
         cursor.execute("""
         UPDATE students
-        SET name=?, phone1=?, phone2=?, phone3=?, course=?, place=?, school=?, busnumber=?, reference=?, reference_department=?
+        SET name=?,phone1=?,phone2=?,phone3=?,course=?,place=?,
+        school=?,busnumber=?,reference=?,reference_department=?
         WHERE id=?
         """,
-        (name, phone1, phone2, phone3, course, place,
-         school, busnumber, reference, reference_department, id))
+        (name,phone1,phone2,phone3,course,place,
+        school,busnumber,reference,reference_department,id))
 
         conn.commit()
         conn.close()
-
-        flash("Student Updated Successfully")
 
         return redirect("/dashboard")
 
@@ -240,13 +250,11 @@ def edit(id):
 
 
 # -----------------------------
-# Export Excel
+# EXPORT EXCEL
 # -----------------------------
+
 @app.route("/export")
 def export():
-
-    if "admin" not in session:
-        return redirect("/admin-login")
 
     conn = sqlite3.connect(DATABASE)
 
@@ -260,13 +268,12 @@ def export():
     return send_file(file, as_attachment=True)
 
 
-
+# -----------------------------
+# RESET DATABASE
+# -----------------------------
 
 @app.route("/reset-db")
 def reset_db():
-
-    if "admin" not in session:
-        return redirect("/admin-login")
 
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
@@ -276,13 +283,13 @@ def reset_db():
     conn.commit()
     conn.close()
 
-    flash("Database cleared successfully")
-
     return redirect("/dashboard")
 
+
 # -----------------------------
-# Logout
+# LOGOUT
 # -----------------------------
+
 @app.route("/logout")
 def logout():
 
@@ -291,7 +298,8 @@ def logout():
 
 
 # -----------------------------
-# Run Server
+# RUN SERVER
 # -----------------------------
+
 if __name__ == "__main__":
     app.run(debug=True)

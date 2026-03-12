@@ -8,12 +8,33 @@
 body{
 font-family:Arial;
 text-align:center;
+margin:0;
+padding:0;
+}
+
+/* Background logo */
+
+body::before{
+content:"";
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background-image:url("{{ url_for('static', filename='logo.png') }}");
+background-size:contain;
+background-position:center;
+background-repeat:no-repeat;
+opacity:0.08;
+z-index:-1;
 }
 
 table{
 width:95%;
 margin:auto;
 border-collapse:collapse;
+background:white;
+box-shadow:0px 5px 15px rgba(0,0,0,0.2);
 }
 
 th,td{
@@ -26,11 +47,25 @@ background:#004aad;
 color:white;
 }
 
+/* Row hover */
+
+tr:hover{
+background:#f5f5f5;
+}
+
+/* Buttons */
+
 button{
 padding:8px 12px;
 border:none;
 border-radius:5px;
 cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+transform:scale(1.05);
+box-shadow:0px 4px 10px rgba(0,0,0,0.3);
 }
 
 .export{
@@ -43,6 +78,11 @@ background:#dc3545;
 color:white;
 }
 
+.edit{
+background:#28a745;
+color:white;
+}
+
 </style>
 
 </head>
@@ -52,19 +92,14 @@ color:white;
 <h1>Student Records</h1>
 
 <form method="GET" action="/dashboard">
-
 <input type="text" name="search" placeholder="Search Hallticket">
-
 <button type="submit">Search</button>
-
 </form>
 
 <br>
 
 <a href="/reset-db">
-<button style="background:red;color:white;padding:8px 12px;border:none;border-radius:5px;">
-Reset Database
-</button>
+<button style="background:red;color:white;">Reset Database</button>
 </a>
 
 <a href="/logout">
@@ -76,7 +111,6 @@ Reset Database
 <table>
 
 <tr>
-
 <th>ID</th>
 <th>Name</th>
 <th>Phone1</th>
@@ -92,13 +126,10 @@ Reset Database
 <th>Date</th>
 <th>Time</th>
 <th>Edit</th>
-
 </tr>
 
+<tbody>
 {% for student in students %}
-
-{% for student in students %}
-
 <tr>
 
 <td>{{student[0]}}</td>
@@ -118,20 +149,15 @@ Reset Database
 
 <td>
 <a href="/edit/{{student[0]}}">
-<button style="background:#07ff51;border:none;padding:6px 10px;border-radius:5px;">
-Edit
-</button>
+<button class="edit">Edit</button>
 </a>
 </td>
 
 </tr>
-
 {% endfor %}
-
-{% endfor %}
+</tbody>
 
 </table>
-
 
 </body>
 </html>

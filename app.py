@@ -10,7 +10,7 @@ app = Flask(__name__)
 app.secret_key = "secretkey"
 
 # -----------------------------
-# DATABASE SETUP
+# DATABASE CONFIG
 # -----------------------------
 
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -86,7 +86,6 @@ def init_db():
 
 init_db()
 
-
 # -----------------------------
 # LOGIN PAGE
 # -----------------------------
@@ -99,8 +98,7 @@ def login():
         username = request.form.get("username")
         password = request.form.get("password")
 
-        if username == "staff" and password == "123":
-
+        if username == "staff" and password == "polystaff":
             session["user"] = username
             return redirect("/form")
 
@@ -146,7 +144,7 @@ def form():
         existing = cursor.fetchone()
 
         if existing:
-            flash("Hallticket number already entered")
+            flash("Hallticket already registered")
             conn.close()
             return render_template("index.html")
 
@@ -171,26 +169,6 @@ def form():
 
 
 # -----------------------------
-# LIVE HALLTICKET CHECK
-# -----------------------------
-
-@app.route("/check-hallticket", methods=["POST"])
-def check_hallticket():
-
-    hallticket = request.form.get("hallticket")
-
-    conn = get_db()
-    cursor = conn.cursor()
-
-    cursor.execute(f"SELECT * FROM students WHERE hallticket={PARAM}", (hallticket,))
-    data = cursor.fetchone()
-
-    conn.close()
-
-    return jsonify({"exists": bool(data)})
-
-
-# -----------------------------
 # ADMIN LOGIN
 # -----------------------------
 
@@ -202,8 +180,7 @@ def admin_login():
         username = request.form.get("username")
         password = request.form.get("password")
 
-        if username == "admin" and password == "admin123":
-
+        if username == "diploma" and password == "scetpoly":
             session["admin"] = True
             return redirect("/dashboard")
 
@@ -222,21 +199,34 @@ def dashboard():
     if "admin" not in session:
         return redirect("/admin-login")
 
-    search = request.args.get("search")
-
     conn = get_db()
     cursor = conn.cursor()
 
-    if search:
-        cursor.execute(f"SELECT * FROM students WHERE hallticket={PARAM}", (search,))
-    else:
-        cursor.execute("SELECT * FROM students ORDER BY id DESC")
-
+    cursor.execute("SELECT * FROM students ORDER BY id DESC")
     students = cursor.fetchall()
 
     conn.close()
 
     return render_template("admin.html", students=students)
+
+
+# -----------------------------
+# EXPORT EXCEL
+# -----------------------------
+
+@app.route("/export")
+def export():
+
+    conn = get_db()
+
+    df = pd.read_sql_query("SELECT * FROM students", conn)
+
+    file = "students.xlsx"
+    df.to_excel(file, index=False)
+
+    conn.close()
+
+    return send_file(file, as_attachment=True)
 
 
 # -----------------------------
@@ -286,43 +276,6 @@ def edit(id):
     conn.close()
 
     return render_template("edit.html", student=student)
-
-
-# -----------------------------
-# EXPORT EXCEL
-# -----------------------------
-
-@app.route("/export")
-def export():
-
-    conn = get_db()
-
-    df = pd.read_sql_query("SELECT * FROM students", conn)
-
-    file = "students.xlsx"
-    df.to_excel(file, index=False)
-
-    conn.close()
-
-    return send_file(file, as_attachment=True)
-
-
-# -----------------------------
-# RESET DATABASE
-# -----------------------------
-
-@app.route("/reset-db")
-def reset_db():
-
-    conn = get_db()
-    cursor = conn.cursor()
-
-    cursor.execute("DELETE FROM students")
-
-    conn.commit()
-    conn.close()
-
-    return redirect("/dashboard")
 
 
 # -----------------------------
